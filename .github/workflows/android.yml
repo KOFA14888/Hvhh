@@ -20,7 +20,7 @@ jobs:
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;27.2.12479018'
       - name: Build ARM64 library
         working-directory: xevilight_internal/internal
-        run: "$ANDROID_HOME/ndk/27.2.12479018/ndk-build" -j2
+        run: '"$ANDROID_HOME/ndk/27.2.12479018/ndk-build" -j2' 
       - name: Test menu
         working-directory: xevilight_internal/internal
         run: python3 checks/verify_standard_menu.py
