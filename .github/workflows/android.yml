@@ -15,9 +15,11 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
       - name: Install SDK and NDK
-        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;27.2.12479018'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y android-sdk-platform-tools
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;27.2.12479018'
       - name: Build ARM64 library
         working-directory: xevilight_internal/internal
         run: '"$ANDROID_HOME/ndk/27.2.12479018/ndk-build" -j2' 
