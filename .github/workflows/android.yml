@@ -19,8 +19,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y android-sdk-platform-tools openjdk-17-jdk
-          # Accept licenses automatically
-          yes | sdkmanager --licenses --sdk_root=$ANDROID_HOME
+          export ANDROID_HOME=/usr/lib/android-sdk
+          export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$PATH
+          # List available packages to debug
+          sdkmanager --list | grep -E "platforms;android|build-tools|ndk"
+          # Accept licenses automatically using sdkmanager --licenses --sdk_root
+          sdkmanager --licenses --sdk_root=$ANDROID_HOME
           # Install packages (use generic NDK 27.2 and platform 35)
           sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;27.2'
       - name: Build ARM64 library
