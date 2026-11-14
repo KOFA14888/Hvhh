@@ -1,0 +1,27 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.hvhh.injector'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'com.hvhh.injector'
+        minSdk 23
+        targetSdk 28
+        versionCode 1
+        versionName '1.0'
+    }
+    sourceSets.main.assets.srcDirs += [layout.buildDirectory.dir('generated/injector-assets')]
+}
+
+def nativeProject = rootProject.file('../xevilight_internal/internal')
+tasks.register('prepareInjectorAssets', Sync) {
+    from("${nativeProject}/inject/vpnService") { rename { 'injector' } }
+    from("${nativeProject}/libs/arm64-v8a/libastra.so")
+    into(layout.buildDirectory.dir('generated/injector-assets'))
+    doFirst {
+        if (!file("${nativeProject}/libs/arm64-v8a/libastra.so").isFile()) {
+            throw new GradleException('Build libastra.so with ndk-build first.')
+        }
+    }
+}
+tasks.named('preBuild').configure { dependsOn 'prepareInjectorAssets' }
