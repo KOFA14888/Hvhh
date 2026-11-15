@@ -4,7 +4,7 @@ on:
     branches: ['arena/4917e2ae-hvhh']
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -55,3 +55,16 @@ jobs:
           path: |
             injector/app/build/outputs/apk/debug/*.apk
             xevilight_internal/internal/libs/arm64-v8a/libastra.so
+      - name: Publish debug APK to Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          apk=injector/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$apk"
+          tag="android-debug-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          gh release create "$tag" "$apk#HVHH-injector-debug.apk" \
+            --target "$GITHUB_SHA" \
+            --title "Android debug build ${GITHUB_RUN_NUMBER}" \
+            --notes "ARM64 debug build. Requires root; functionality on a device has not been verified." \
+            --prerelease
