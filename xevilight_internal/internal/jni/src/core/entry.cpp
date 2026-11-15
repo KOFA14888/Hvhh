@@ -7,6 +7,7 @@
 
 #include <EGL/egl.h>
 #include <GLES3/gl3.h>
+#include "core/log_config.hpp"
 #include "core/hook.hpp"
 #include "game/offsets.hpp"
 #include "features/visuals/esp_runtime.hpp"
