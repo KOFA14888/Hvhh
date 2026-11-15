@@ -3,6 +3,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 LOCAL_MODULE := astra
 LOCAL_SRC_FILES := src/core/entry.cpp \
+    src/core/obf.cpp \
     third_party/stb/stb_image.cpp \
     src/assets/skin_atlas.S \
     third_party/imgui/imgui.cpp \
