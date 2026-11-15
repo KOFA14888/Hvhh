@@ -87,8 +87,7 @@ struct Enc {
     }
 };
 
-// Single shared decoder — defined once in core/bypass.cpp. noinline + barrier
-// there keep the compiler from folding plaintext back into .rodata.
+// Shared decoder is implemented in core/obf.cpp.
 void decode(const std::uint8_t* src, std::size_t n, std::uint32_t seed, char* out);
 
 }  // namespace xev::obf

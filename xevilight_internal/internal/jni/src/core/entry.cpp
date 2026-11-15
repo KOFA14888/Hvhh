@@ -148,11 +148,6 @@ std::atomic<int>  g_espWorkerHeight{0};
 // second lock is needed; we reuse the existing mutex.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// ── stealth state ─────────────────────────────────────────────────────────────
-// Track whether we have already performed the one-shot GOT restore so we
-// don't try to double-restore on the next dl_iterate_phdr pass.
-// ─────────────────────────────────────────────────────────────────────────────
-
 struct PointerEvent { float x; float y; int kind; };
 std::mutex g_pointerMutex;
 // Use a fixed-size ring buffer instead of std::vector to avoid O(N) erase(begin())
