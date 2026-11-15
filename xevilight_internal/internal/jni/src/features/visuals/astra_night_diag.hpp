@@ -636,7 +636,7 @@ inline void controls(){
  {std::lock_guard<std::mutex> lock(pyramid_test::logMutex);
   if(!pyramid_test::logLines.empty())last=pyramid_test::logLines.back();}
  if(!last.empty())ImGui::TextWrapped(XS("%s"),last.c_str());
- ImGui::TextWrapped(XS("Save after applying, before another apply/restore clears the operation log."));
+ ImGui::TextWrapped("%s", XS("Save after applying, before another apply/restore clears the operation log."));
 }
 
 }
