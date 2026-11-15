@@ -74,7 +74,7 @@ public class MainActivity extends Activity {
             byte[] buf = new byte[4096];
             int n;
             while ((n = in.read(buf)) != -1) {
-                if (output.size() < 65536) out.write(buf, 0, Math.min(n, 65536 - output.size()));
+                if (output.size() < 65536) output.write(buf, 0, Math.min(n, 65536 - output.size()));
             }
         }
         int exit = process.waitFor();
