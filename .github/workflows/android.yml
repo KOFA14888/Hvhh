@@ -33,7 +33,7 @@ jobs:
         working-directory: xevilight_internal/internal
         run: |
           set -o pipefail
-          trap 'rc=$?; echo "Native build exited with status $rc" >> "$GITHUB_STEP_SUMMARY"; tail -c 30000 "$RUNNER_TEMP/native.log" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true' EXIT
+          trap 'rc=$?; echo "Native build exited with status $rc" >> "$GITHUB_STEP_SUMMARY"; tail -c 30000 "$RUNNER_TEMP/native.log" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true; if [ "$rc" -ne 0 ]; then tail -n 20 "$RUNNER_TEMP/native.log" | while IFS= read -r line; do echo "::error::${line//%/%25}"; done; fi' EXIT
           "$ANDROID_HOME/ndk/27.2.12479018/ndk-build" -j2 2>&1 | tee "$RUNNER_TEMP/native.log"
           test -s libs/arm64-v8a/libastra.so
       - name: Test menu
