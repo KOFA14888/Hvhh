@@ -15,30 +15,27 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Install SDK and NDK
+      - name: Install Android packages
+        shell: bash
         run: |
-          sudo apt-get update
-          sudo apt-get install -y android-sdk-platform-tools openjdk-17-jdk
-          export ANDROID_HOME=/usr/lib/android-sdk
-          export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$PATH
-          # List available packages to debug
-          sdkmanager --list | grep -E "platforms;android|build-tools|ndk"
-          # Accept licenses automatically using sdkmanager --licenses --sdk_root
-          sdkmanager --licenses --sdk_root=$ANDROID_HOME
-          # Install packages (use generic NDK 27.2 and platform 35)
-          sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;27.2'
+          set -eo pipefail
+          trap 'rc=$?; echo "Install exited with status $rc" >> "$GITHUB_STEP_SUMMARY"; tail -c 30000 "$RUNNER_TEMP/install.log" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true' EXIT
+          exec > >(tee "$RUNNER_TEMP/install.log") 2>&1
+          # GitHub-hosted Ubuntu runners include the Android SDK command-line tools.
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$SDKMANAGER"
+          # yes can receive SIGPIPE when sdkmanager finishes reading; check sdkmanager's status.
+          set +o pipefail
+          yes | "$SDKMANAGER" --licenses >/dev/null
+          set -o pipefail
+          "$SDKMANAGER" 'platforms;android-35' 'build-tools;35.0.0' 'ndk;27.2.12479018'
       - name: Build ARM64 library
         working-directory: xevilight_internal/internal
         run: |
-          # Ensure NDK path is set
-          export NDK_HOME=$ANDROID_HOME/ndk/27.2
-          "$NDK_HOME/ndk-build" -j2 || {
-            echo "ndk-build failed, trying fallback..."
-            # Fallback: if ndk-build fails, we can create a dummy libastra.so to unblock Gradle
-            mkdir -p libs/arm64-v8a
-            touch libs/arm64-v8a/libastra.so
-            exit 0
-          }
+          set -o pipefail
+          trap 'rc=$?; echo "Native build exited with status $rc" >> "$GITHUB_STEP_SUMMARY"; tail -c 30000 "$RUNNER_TEMP/native.log" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true' EXIT
+          "$ANDROID_HOME/ndk/27.2.12479018/ndk-build" -j2 2>&1 | tee "$RUNNER_TEMP/native.log"
+          test -s libs/arm64-v8a/libastra.so
       - name: Test menu
         working-directory: xevilight_internal/internal
         run: python3 checks/verify_standard_menu.py
@@ -48,12 +45,9 @@ jobs:
       - name: Build debug APK
         working-directory: injector
         run: |
-          # Ensure libastra.so exists (fallback if ndk-build failed)
-          if [ ! -f ../xevilight_internal/internal/libs/arm64-v8a/libastra.so ]; then
-            mkdir -p ../xevilight_internal/internal/libs/arm64-v8a
-            touch ../xevilight_internal/internal/libs/arm64-v8a/libastra.so
-          fi
-          gradle --no-daemon assembleDebug
+          set -o pipefail
+          trap 'rc=$?; echo "APK build exited with status $rc" >> "$GITHUB_STEP_SUMMARY"; tail -c 30000 "$RUNNER_TEMP/gradle.log" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true' EXIT
+          gradle --no-daemon assembleDebug 2>&1 | tee "$RUNNER_TEMP/gradle.log"
       - uses: actions/upload-artifact@v4
         with:
           name: hvhh-android-arm64
