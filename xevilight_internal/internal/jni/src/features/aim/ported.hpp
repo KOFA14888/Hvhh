@@ -767,7 +767,6 @@ inline bool installSilentHooks() {
 #endif
 }
 
-.
 inline void silentTick() {
     auto config = configuration();
     const auto& settings = config.silent;

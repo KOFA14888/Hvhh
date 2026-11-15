@@ -535,7 +535,7 @@ inline void panel(){
    lighting.enabled=enabled&&useLighting;lighting.strength=lightStrength;
    astra_night::publish(lighting);
   }
-  ImGui::TextWrapped(XS("Texture/color changes apply on edit release. Lighting also affects lit weapons and players. Sky unchanged."));
+  ImGui::TextWrapped("%s", XS("Texture/color changes apply on edit release. Lighting also affects lit weapons and players. Sky unchanged."));
   ImGui::TreePop();
  }
  // Keep pending OFF requests until synchronous processing finishes.

@@ -70,8 +70,6 @@ inline void install(std::uintptr_t base) {
     g_state = (a && b && c) ? 1 : -2;
 }
 
-/
-
 inline void publish(void* self, float pitch, float yaw) {
     if (!self || !std::isfinite(pitch) || !std::isfinite(yaw)) {
         g_live.store(false, std::memory_order_relaxed);
@@ -178,7 +176,7 @@ inline void spoof(void* cmd) {
         return;
     g_state = {true, identity, autoNow(), value};
 
-    if (c.antiAim.localModel) {.
+    if (c.antiAim.localModel) {
         std::uintptr_t data = 0;
         void* anim = component(p, XS("chc"));
         if (anim && field(anim, 0xa0, data) && data > 0x10000 &&
